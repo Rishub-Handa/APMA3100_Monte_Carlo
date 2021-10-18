@@ -2,14 +2,12 @@
 from rng import randomNumberGenerator
 from numpy import log as ln 
 
-
 # Log all times it took to realize call 
 rng_idx = 1
 l = 1/12
 
 times = []
 
-# QUESTION: Did I do this right? 
 # Calculating inverse cdf 
 # p = 1-e^(-lx)
 # 1-p = e^(-lx)
@@ -48,8 +46,10 @@ for c in range(500):
         else: 
             # Available 
 
-            # Redefine probability for inv cdf on (0, 1)
-            p = (rng - 0.5) * 2 
+            # Generate a completely new random number [0, 1] (available is independent of X)
+            p = randomNumberGenerator(rng_idx)
+            rng_idx += 1
+
             pick_up_time = x_inv_cdf(p)
             # print(pick_up_time)
 
@@ -67,31 +67,39 @@ for c in range(500):
         # End the call 
         t += 1
 
-        
-
     times.append(t)
 
 
-# QUESTION: Is this the right way to do this? 
-# Return the first x such that F(x) >= p
+# Return the x such that F(x) = p. If p is between increments of 1/500, return the average of the two closest values. 
 def w_inv_cdf(p):
 
     n = len(times)
 
+    if p == 0: return times[0]
+
     for i in range(n): 
-        if i/n >= p: 
+        if (i+1)/n == p: 
             return times[i]
+        
+        elif (i+1)/n > p: # This will crash on p = 0.9999, but it should be fine for this 
+            return (times[i]+times[i+1])/2
+
+    if p == 1: return times[-1]
 
 
-# QUESTION: Is this the right way to do this? 
+
 # Return the % of times covered until w > n[i]
 def w_cdf(w): 
 
     n = len(times)
+
+    if w < times[0]: return 0
     
     for i in range(n): 
-        if w > n[i]: 
-            return i/n
+        if w > times[i]: 
+            return (i+1)/n
+    
+    return 1
 
 
 
