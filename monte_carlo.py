@@ -70,7 +70,11 @@ for c in range(500):
     times.append(t)
 
 
+times.sort()
+
 # Return the x such that F(x) = p. If p is between increments of 1/500, return the average of the two closest values. 
+# P(W <= some w) = 0.909, figure out w 
+
 def w_inv_cdf(p):
 
     n = len(times)
@@ -89,6 +93,8 @@ def w_inv_cdf(p):
 
 
 # Return the % of times covered until w > n[i]
+# P(W <= some_time) = some probability 
+# P(W <= 50)
 def w_cdf(w): 
 
     n = len(times)
@@ -96,7 +102,7 @@ def w_cdf(w):
     if w < times[0]: return 0
     
     for i in range(n): 
-        if w > times[i]: 
+        if w >= times[i] and w < times[i+1]: 
             return (i+1)/n
     
     return 1
@@ -107,5 +113,13 @@ def w_cdf(w):
 # Run python3 -i monte_carlo.py
 # To get the cdf of w, run w_cdf(w) in the terminal 
 # To get the inv_cdf of w, run w_inv_cdf(p) in the terminal 
+
+import numpy as np 
+print("mean", np.mean(times))
+
+import pandas as pd 
+
+df = pd.DataFrame(times, columns=["times"])
+df.to_csv("times.csv")
 
 
